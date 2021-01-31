@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.codetest.phoneapp.application.createcostumerorder.CostumerOrderRequestDTO;
 import es.codetest.phoneapp.application.createcostumerorder.CostumerOrderResponseDTO;
 import es.codetest.phoneapp.application.createcostumerorder.CreateCostumerOrderService;
-import org.apache.logging.log4j.util.Strings;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
