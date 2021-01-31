@@ -1,5 +1,8 @@
 package es.codetest.phoneapp.application.createcostumerorder;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -10,7 +13,12 @@ public class CostumerOrderRequestDTO {
   private String email;
   private List<String> phonesNames;
 
-  public CostumerOrderRequestDTO(String name, String surname, String email, List<String> phonesNames) {
+  @JsonCreator
+  public CostumerOrderRequestDTO(
+      @JsonProperty(value = "name", required = true) String name,
+      @JsonProperty(value = "surname", required = true) String surname,
+      @JsonProperty(value = "email", required = true) String email,
+      @JsonProperty(value = "phonesNames", required = true) List<String> phonesNames) {
     this.name = name;
     this.surname = surname;
     this.email = email;
