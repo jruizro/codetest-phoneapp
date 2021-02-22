@@ -41,6 +41,13 @@ dependencies {
     implementation "io.vertx:vertx-web:$vertxVersion"
     implementation "io.vertx:vertx-web-client:$vertxVersion"
 
+    // DataBase Migration
+    implementation("org.flywaydb:flyway-core:5.2.4")
+
+    // JDBC Driver
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.postgresql:postgresql:42.2.12")
+
     testImplementation "io.vertx:vertx-junit5:$vertxVersion"
     testImplementation "io.vertx:vertx-rx-java:$vertxVersion"
     testImplementation "io.vertx:vertx-rx-java2:$vertxVersion"
