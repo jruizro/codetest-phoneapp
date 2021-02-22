@@ -1,11 +1,11 @@
 # Phone Catalog App Microservice
 
 Microservice to get a Phone Catalog and create a Costumer Oder of phones in catalog.
+[Vertx 4 Implementation]
 
 ### API Information
 
 Service have 2 end point:
-(See API Swagger2 Documentation [here](/swagger-ui.html#).):
 
 - Get all Catalog Phones
 > GET v1/phones
@@ -29,10 +29,8 @@ DDD (Domain Driven Design) approach.
 Frameworks and libs used:
 
 - JAVA 11
-- Spring Boot 2.4.2
+- Spring Boot 2.4.2 (without Spring Boot Web)
 - JUnit 5
-- Swagger2 API Documentation
+- Vertx 4
 
-### Repository Links
 
-- [GitHub Repository](https://github.com/jruizro/codetest-phoneapp)

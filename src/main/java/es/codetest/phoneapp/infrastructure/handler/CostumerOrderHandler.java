@@ -44,8 +44,7 @@ public class CostumerOrderHandler implements Handler<RoutingContext> {
             .setChunked(true)
             .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
             .setStatusCode(201)
-            .write(new Gson().toJson(orderCreated))
-            .end();
+            .end(new Gson().toJson(orderCreated));
       });
 
     } catch (Exception e) {

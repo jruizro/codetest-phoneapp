@@ -1,12 +1,19 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.2'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
+    id "org.springframework.boot" version "2.4.2"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id "java"
 }
 
-group = 'es.codetest'
-version = '1.0'
-sourceCompatibility = '11'
+ext {
+    // vertxVersion = "3.9.5"
+    vertxVersion = "4.0.2"
+    junitVersion = "5.7.0"
+    jacksonVersion = "2.11.4"
+}
+
+group = "es.codetest"
+version = "1.0"
+sourceCompatibility = "11"
 
 repositories {
     mavenCentral()
@@ -14,37 +21,65 @@ repositories {
 
 dependencies {
 
-    implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.apache.commons:commons-lang3:3.11'
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.apache.commons:commons-lang3:3.11"
 
     // Preconditions
-    implementation 'com.google.guava:guava:23.0'
+    implementation "com.google.guava:guava:23.0"
 
     // Json
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation "com.google.code.gson:gson:2.8.6"
 
     // Netty
-    implementation 'io.netty:netty-all:4.1.59.Final'
+    implementation "io.netty:netty-all:4.1.59.Final"
 
-    // Vertx
-    implementation 'io.vertx:vertx-core:3.9.3'
-    implementation 'io.vertx:vertx-web:3.9.3'
-    implementation 'io.vertx:vertx-web-client:3.9.3'
+    // Jackson
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
 
-    testImplementation 'io.vertx:vertx-junit5:3.9.5'
-    testImplementation 'io.vertx:vertx-rx-java:3.9.5'
-    testImplementation 'io.vertx:vertx-rx-java2:3.9.5'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    // Vertx"    
+    implementation "io.vertx:vertx-core:$vertxVersion"
+    implementation "io.vertx:vertx-web:$vertxVersion"
+    implementation "io.vertx:vertx-web-client:$vertxVersion"
 
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testImplementation "io.vertx:vertx-junit5:$vertxVersion"
+    testImplementation "io.vertx:vertx-rx-java:$vertxVersion"
+    testImplementation "io.vertx:vertx-rx-java2:$vertxVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
 
 test {
     useJUnitPlatform()
 }
 
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events "skipped", "failed", "standardOut"
+        showExceptions true
+        exceptionFormat "short"
+        showCauses true
+        showStackTraces true
+
+        info.events = debug.events
+        info.exceptionFormat = debug.exceptionFormat
+
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                def startItem = '|  ', endItem = '  |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
+        }
+    }
+}
+
 tasks.withType(JavaCompile) {
-    options.compilerArgs << '-Xlint:unchecked'
+    options.compilerArgs << "-Xlint:unchecked"
     options.deprecation = true
 }

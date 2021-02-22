@@ -35,8 +35,7 @@ public class PhoneHandler implements Handler<RoutingContext> {
           .setChunked(true)
           .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
           .setStatusCode(200)
-          .write(result)
-          .end();
+          .end(result);
 
     } catch (Exception e) {
       LOGGER.error(e.getMessage());
