@@ -1,22 +1,22 @@
-package es.codetest.phoneapp.infrastructure.handler;
+package es.codetest.phoneapp.infrastructure.verticle.handler;
 
 import com.google.gson.Gson;
 import es.codetest.phoneapp.application.getphonecatalog.GetPhoneCatalogService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.vertx.core.Handler;
-import io.vertx.core.http.HttpHeaders;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.reactivex.core.http.HttpHeaders;
+import io.vertx.reactivex.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class PhoneHandler implements Handler<RoutingContext> {
+public class PhoneCatalogRestHandler implements Handler<RoutingContext> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PhoneHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PhoneCatalogRestHandler.class);
 
   private final GetPhoneCatalogService getPhoneCatalogService;
 
-  public PhoneHandler(GetPhoneCatalogService getPhoneCatalogService) {
+  public PhoneCatalogRestHandler(GetPhoneCatalogService getPhoneCatalogService) {
     this.getPhoneCatalogService = getPhoneCatalogService;
   }
 

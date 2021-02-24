@@ -32,6 +32,7 @@ public final class CostumerOrder {
     this.totalPrice = orderPhones.stream()
         .mapToInt(OrderPhone::getPrice)
         .sum();
+
   }
 
   public static Builder create() {
@@ -94,5 +95,7 @@ public final class CostumerOrder {
       return new CostumerOrder(this);
     }
   }
+
+
 
 }

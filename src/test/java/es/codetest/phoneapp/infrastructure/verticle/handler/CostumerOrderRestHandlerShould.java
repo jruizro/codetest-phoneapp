@@ -1,14 +1,13 @@
-package es.codetest.phoneapp.infrastructure.handler;
+package es.codetest.phoneapp.infrastructure.verticle.handler;
 
 import es.codetest.phoneapp.application.createcostumerorder.CostumerOrderRequestDTO;
 import es.codetest.phoneapp.application.createcostumerorder.CostumerOrderResponseDTO;
 import es.codetest.phoneapp.application.createcostumerorder.CreateCostumerOrderService;
-import es.codetest.phoneapp.infrastructure.verticle.RESTVerticle;
+import es.codetest.phoneapp.infrastructure.verticle.RESTfulVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
-import io.vertx.ext.web.codec.BodyCodec;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -27,20 +26,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(VertxExtension.class)
-public class CostumerOrderHandlerShould {
+public class CostumerOrderRestHandlerShould {
 
   private static final Integer HTTP_PORT = 15000;
   private static final String COSTUMER_ORDER_PATH = "/v1/order";
 
-  private CostumerOrderHandler costumerOrderHandler;
+  private CostumerOrderRestHandler costumerOrderRestHandler;
 
-  private PhoneHandler phoneHandlerMock = mock(PhoneHandler.class);
+  private PhoneCatalogRestHandler phoneCatalogRestHandlerMock = mock(PhoneCatalogRestHandler.class);
   private CreateCostumerOrderService createCostumerOrderServiceMock = mock(CreateCostumerOrderService.class);
 
   @BeforeEach
   void deployVerticle(Vertx vertx, VertxTestContext testContext) {
-    costumerOrderHandler = new CostumerOrderHandler(createCostumerOrderServiceMock);
-    vertx.deployVerticle(new RESTVerticle(HTTP_PORT, phoneHandlerMock, costumerOrderHandler),
+    costumerOrderRestHandler = new CostumerOrderRestHandler(createCostumerOrderServiceMock);
+    vertx.deployVerticle(new RESTfulVerticle(HTTP_PORT, phoneCatalogRestHandlerMock, costumerOrderRestHandler),
         testContext.succeeding(ar -> testContext.completeNow()));
   }
 

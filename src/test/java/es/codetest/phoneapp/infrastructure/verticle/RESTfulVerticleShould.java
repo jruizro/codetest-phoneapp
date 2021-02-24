@@ -1,7 +1,7 @@
 package es.codetest.phoneapp.infrastructure.verticle;
 
-import es.codetest.phoneapp.infrastructure.handler.CostumerOrderHandler;
-import es.codetest.phoneapp.infrastructure.handler.PhoneHandler;
+import es.codetest.phoneapp.infrastructure.verticle.handler.CostumerOrderRestHandler;
+import es.codetest.phoneapp.infrastructure.verticle.handler.PhoneCatalogRestHandler;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -13,18 +13,18 @@ import org.mockito.Mock;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(VertxExtension.class)
-public class RESTVerticleShould {
+public class RESTfulVerticleShould {
 
   private static final Integer HTTP_PORT = 15000;
 
   @Mock
-  private PhoneHandler phoneHandler;
+  private PhoneCatalogRestHandler phoneCatalogRestHandler;
   @Mock
-  private CostumerOrderHandler costumerOrderHandler;
+  private CostumerOrderRestHandler costumerOrderRestHandler;
 
   @BeforeEach
   void deployVerticle(Vertx vertx, VertxTestContext testContext) {
-    vertx.deployVerticle(new RESTVerticle(HTTP_PORT, phoneHandler, costumerOrderHandler),
+    vertx.deployVerticle(new RESTfulVerticle(HTTP_PORT, phoneCatalogRestHandler, costumerOrderRestHandler),
         testContext.succeeding(ar -> testContext.completeNow()));
   }
 
