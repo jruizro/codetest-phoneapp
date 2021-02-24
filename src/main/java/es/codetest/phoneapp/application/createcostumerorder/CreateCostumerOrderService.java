@@ -18,7 +18,7 @@ public class CreateCostumerOrderService {
         .withSurname(requestOrder.getSurname())
         .withEmail(requestOrder.getEmail())
         .withPhonesNames(requestOrder.getPhonesNames())
-        .withPhoneCatalog(catalogPhoneRepository.getPhoneCatalog())
+        .withPhoneCatalog(catalogPhoneRepository.getPhoneCatalog().blockingGet())
         .build();
 
     return new CostumerOrderResponseDTO(

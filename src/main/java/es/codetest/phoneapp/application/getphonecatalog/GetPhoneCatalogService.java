@@ -1,9 +1,9 @@
 package es.codetest.phoneapp.application.getphonecatalog;
 
 import es.codetest.phoneapp.domain.repository.CatalogPhoneRepository;
+import io.reactivex.Single;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GetPhoneCatalogService {
 
@@ -13,16 +13,12 @@ public class GetPhoneCatalogService {
     this.catalogPhoneRepository = catalogPhoneRepository;
   }
 
-  public List<PhoneCatalogInfoDTO> execute() {
+  public Single<List<PhoneCatalogInfoDTO>> execute() {
 
-    return catalogPhoneRepository.getPhoneCatalog().stream()
-        .map(cp -> new PhoneCatalogInfoDTO(
-            cp.getName(),
-            cp.getDescription(),
-            cp.getImage(),
-            cp.getPrice()
-        )).collect(Collectors.toList());
-
+    return catalogPhoneRepository.getPhoneCatalog()
+        .flattenAsObservable(phone -> phone)
+        .map(phone -> new PhoneCatalogInfoDTO(phone.getName(), phone.getDescription(), phone.getImage(), phone.getPrice()))
+        .toList();
   }
 
 }

@@ -1,12 +1,32 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.2'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
+    id "org.springframework.boot" version "2.4.2"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id "java"
+    id "jacoco"
+    id "com.avast.gradle.docker-compose" version '0.14.0'
 }
 
-group = 'es.codetest'
-version = '1.0'
-sourceCompatibility = '11'
+configurations {
+    integrationtestImplementation.extendsFrom testImplementation
+    integrationtestTestRuntimeClasspath.extendsFrom testRuntimeClasspath
+}
+
+sourceSets {
+    integrationtest {
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+ext {
+    vertxVersion = "4.0.2"
+    junitVersion = "5.7.0"
+    jacksonVersion = "2.11.4"
+}
+
+group = "es.codetest"
+version = "1.0"
+sourceCompatibility = "11"
 
 repositories {
     mavenCentral()
@@ -14,24 +34,109 @@ repositories {
 
 dependencies {
 
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.apache.commons:commons-lang3:3.11'
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.apache.commons:commons-lang3:3.11"
 
-    // Swagger
-    implementation("io.springfox:springfox-swagger2:2.9.2")
-    implementation("io.springfox:springfox-swagger-ui:2.9.2")
+    // Preconditions
+    implementation "com.google.guava:guava:23.0"
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testImplementation 'com.google.code.gson:gson:2.8.6'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    // Json
+    implementation "com.google.code.gson:gson:2.8.6"
+
+    // Netty
+    implementation "io.netty:netty-all:4.1.59.Final"
+
+    // Jackson
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+
+    // Vertx Core & Web
+    implementation "io.vertx:vertx-core:$vertxVersion"
+    implementation "io.vertx:vertx-web:$vertxVersion"
+    implementation "io.vertx:vertx-web-client:$vertxVersion"
+
+    // Vertx RxJava2
+    implementation "io.vertx:vertx-rx-java2:$vertxVersion"
+
+    // Vertx Postgres JDBC
+    implementation "io.vertx:vertx-pg-client:$vertxVersion"
+
+    // DataBase Migration
+    implementation("org.flywaydb:flyway-core:5.2.4")
+
+    // Spring Boot JDBC Driver (for Flyway)
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.postgresql:postgresql:42.2.12")
+
+    testImplementation "io.vertx:vertx-junit5:$vertxVersion"
+    testImplementation "io.vertx:vertx-rx-java:$vertxVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+}
+
+task integrationtest(type: Test) {
+
+    testClassesDirs = sourceSets.integrationtest.output.classesDirs
+    classpath = sourceSets.integrationtest.runtimeClasspath
+
+    doFirst {
+        dockerCompose.exposeAsEnvironment(integrationtest)
+        dockerCompose.exposeAsSystemProperties(integrationtest)
+        systemProperty 'postgres.host', dockerCompose.servicesInfos.postgresql.'postgresql_1'.host
+        systemProperty 'postgres.port', dockerCompose.servicesInfos.postgresql.'postgresql_1'.port
+    }
+    mustRunAfter(test)
+
+}
+
+check.dependsOn(integrationtest)
+
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events "skipped", "failed", "standardOut"
+        showExceptions true
+        exceptionFormat "short"
+        showCauses true
+        showStackTraces true
+
+        info.events = debug.events
+        info.exceptionFormat = debug.exceptionFormat
+
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                def startItem = '|  ', endItem = '  |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
+        }
+    }
+}
+
+dockerCompose.isRequiredBy(integrationtest)
+
+dockerCompose {
+    useComposeFiles = ['docker-compose.yml'] // like 'docker-compose -f <file>'
+    captureContainersOutput = true // prints output of all containers to Gradle output - very useful for debugging
+    stopContainers = true // doesn't call `docker-compose down` - useful for debugging
+    removeContainers = true
+    removeOrphans = true
+    upAdditionalArgs = ['--force-recreate']
 }
 
 test {
     useJUnitPlatform()
 }
 
+integrationtest {
+    useJUnitPlatform()
+}
+
 tasks.withType(JavaCompile) {
-    options.compilerArgs << '-Xlint:unchecked'
+    options.compilerArgs << "-Xlint:unchecked"
     options.deprecation = true
 }
