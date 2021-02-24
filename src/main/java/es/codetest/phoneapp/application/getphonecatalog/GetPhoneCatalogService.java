@@ -19,7 +19,6 @@ public class GetPhoneCatalogService {
         .flattenAsObservable(phone -> phone)
         .map(phone -> new PhoneCatalogInfoDTO(phone.getName(), phone.getDescription(), phone.getImage(), phone.getPrice()))
         .toList();
-
   }
 
 }

@@ -41,6 +41,4 @@ public class RestfulVerticleConfiguration {
     return new CostumerOrderRestHandler(createCostumerOrderService);
   }
 
-
-
 }

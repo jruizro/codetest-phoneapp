@@ -15,8 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
@@ -63,15 +65,34 @@ public class PostgresCatalogPhoneRepositoryShould {
     Single<List<CatalogPhone>> result = catalogPhoneRepository.getPhoneCatalog();
 
     // then
-    assertEquals(result.blockingGet().size(), 6);
-    /*
-    assertTrue(catalogPhoneNames.contains("Ericsson"));
-    assertTrue(catalogPhoneNames.contains("Nokia"));
-    assertTrue(catalogPhoneNames.contains("iPhone"));
-    assertTrue(catalogPhoneNames.contains("Blackberry"));
-    assertTrue(catalogPhoneNames.contains("Samsung"));
-    assertTrue(catalogPhoneNames.contains("Xiaomi"));
-    */
+    List<CatalogPhone> resultList = result.blockingGet();
+    assertEquals(resultList.size(), 6);
+    List<String> phonesList = resultList.stream().map(CatalogPhone::getName).collect(Collectors.toList());
+    assertTrue(phonesList.contains("EricssonTest"));
+    assertTrue(phonesList.contains("NokiaTest"));
+    assertTrue(phonesList.contains("iPhoneTest"));
+    assertTrue(phonesList.contains("BlackberryTest"));
+    assertTrue(phonesList.contains("SamsungTest"));
+    assertTrue(phonesList.contains("XiaomiTest"));
+  }
+
+  @Test
+  @Sql(
+      executionPhase = BEFORE_TEST_METHOD,
+      statements = {
+          "DELETE FROM PHONES_CATALOGUE"
+      }
+  )
+  public void returnAnyCatalogIfAnyExists() {
+    // given
+
+    // when
+    Single<List<CatalogPhone>> result = catalogPhoneRepository.getPhoneCatalog();
+
+    // then
+    List<CatalogPhone> resultList = result.blockingGet();
+    assertEquals(resultList.size(), 0);
+
   }
 
 }
